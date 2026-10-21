@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Courier; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Courier; -webkit-text-stroke: #000000; min-height: 17.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="pt"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Muon Catch - O Jogo das Partículas&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body { margin: 0; background: #0b0c10; color: white; font-family: sans-serif; overflow: hidden; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>canvas { display: block; background: linear-gradient(#020c1b, #0d1b2a); margin: 0 auto; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#info { position: absolute; top: 10px; left: 10px; font-size: 20px; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div id="info"&gt;Pontuação: &lt;span id="score"&gt;0&lt;/span&gt; | Vidas: &lt;span id="lives"&gt;3&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;canvas id="gameCanvas"&gt;&lt;/canvas&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1">const canvas = document.getElementById("gameCanvas");</span></p>
+<p class="p1"><span class="s1">const ctx = canvas.getContext("2d");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">canvas.width = 800;</span></p>
+<p class="p1"><span class="s1">canvas.height = 600;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">let score = 0;</span></p>
+<p class="p1"><span class="s1">let lives = 3;</span></p>
+<p class="p1"><span class="s1">let gameOver = false;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Detetor do Jogador</span></p>
+<p class="p1"><span class="s1">const detector = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>x: canvas.width / 2 - 50,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>y: canvas.height - 40,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>width: 100,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>height: 20,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>speed: 8</span></p>
+<p class="p1"><span class="s1">};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Lista de Muões no ecrã</span></p>
+<p class="p1"><span class="s1">let muons = [];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Controlos</span></p>
+<p class="p1"><span class="s1">let keys = {};</span></p>
+<p class="p1"><span class="s1">window.addEventListener("keydown", e =&gt; keys[e.key] = true);</span></p>
+<p class="p1"><span class="s1">window.addEventListener("keyup", e =&gt; keys[e.key] = false);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Função para criar um novo Muão</span></p>
+<p class="p1"><span class="s1">function spawnMuon() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (gameOver) return;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>muons.push({</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>x: Math.random() * (canvas.width - 20) + 10,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>y: 0,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>radius: 10,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>speed: Math.random() * 2 + 2,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// O "tempo de vida" do muão simulado por uma taxa de desintegração aleatória</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>lifespan: 1.0<span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Criar um novo muão a cada 1 segundo</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>setTimeout(spawnMuon, 1000);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Atualizar a lógica do jogo</span></p>
+<p class="p1"><span class="s1">function update() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (gameOver) return;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Mover Detetor</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (keys["ArrowLeft"] &amp;&amp; detector.x &gt; 0) detector.x -= detector.speed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (keys["ArrowRight"] &amp;&amp; detector.x &lt; canvas.width - detector.width) detector.x += detector.speed;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Atualizar Muões</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>for (let i = muons.length - 1; i &gt;= 0; i--) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let m = muons[i];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>m.y += m.speed;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>m.lifespan -= 0.0015; // O muão vai decaindo com o tempo</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Se o muão se desintegrar antes de chegar ao chão</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (m.lifespan &lt;= 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>muons.splice(i, 1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>continue;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Colisão com o Detetor</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (m.y + m.radius &gt;= detector.y &amp;&amp; m.x &gt;= detector.x &amp;&amp; m.x &lt;= detector.x + detector.width) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>score += 10;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById("score").innerText = score;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>muons.splice(i, 1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>continue;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Se passar o detetor e tocar no chão (o cientista perdeu a oportunidade de detetá-lo)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (m.y &gt; canvas.height) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>muons.splice(i, 1);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>lives--;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById("lives").innerText = lives;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (lives &lt;= 0) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>gameOver = true;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>alert("Fim de Jogo! Conseguiu detetar " + score + " pontos de muões.");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Desenhar os elementos no ecrã</span></p>
+<p class="p1"><span class="s1">function draw() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.clearRect(0, 0, canvas.width, canvas.height);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Desenhar Detetor</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.fillStyle = "#00ffcc";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ctx.fillRect(detector.x, detector.y, detector.width, detector.height);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Desenhar Muões</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>muons.forEach(m =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx.beginPath();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// A cor muda (fica mais fraca) conforme o muão se aproxima da desintegração</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx.fillStyle = `rgba(255, 50, 50, ${m.lifespan})`;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx.fill();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ctx.closePath();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Loop do Jogo</span></p>
+<p class="p1"><span class="s1">function gameLoop() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>update();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>draw();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>requestAnimationFrame(gameLoop);</span></p>
+<p class="p1"><span class="s1">}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">// Iniciar</span></p>
+<p class="p1"><span class="s1">spawnMuon();</span></p>
+<p class="p1"><span class="s1">gameLoop();</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
